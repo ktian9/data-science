@@ -19,6 +19,24 @@ from langchain.docstore.document import Document
 # )
 
 
+prompt = """Given a detailed service event report about an engine or vehicle failure, extract the following information from the text and format the result as a python dictionary with JSON formatting standards. This means surround all properties in double quotes instead of single:
+
+        With the key of "model_identified_complaint", extract the primary customer complaint. The complaint is defined as the main engine or vehicle issue that the customer or technician is claiming is causing the repair, and summarize the complaint in less than 4 words, including the exact part or system affected, using technical terms.
+If no such information is found, mention "Not available". in the response, only keep the relevant information. Avoid narriative explainations. Only include engine related terms and complaints. Do not count P codes as a complaint. Prioritize the first mentioned complaint, and if there is something mentioned by the customer prioritize that. If the text contains the phrase "maint" or similar to "maintenance", output the complaint as maintenance. For the outputted complaint, fix any spelling mistakes. If the identified complaint is in another language, translate it to English. Remove any quotations and extra punctuation, just keep the alphanumeric characters. Output the result in lowercase.
+With the key of "identified_cause", extract the assignable cause of repair if any are mentioned in the text. For example: Belt noise, no communication, no start, sensor malfunctioning. This cause should identify the component or the cause that was fixed that able to fix the issue during the repair.
+only keep the relevant information and avoid narrative explanations.
+With the key of "identified_repairs", extract and present the repair actions in a short summary, For example: replaced nox sensor, replaced egr cooler, fixed coolant leak, in the response and only keep the relevant information while avoiding narrative explanations.
+With the key of "identified_keywords", extract important service, repair or symptom related keywords in a comma separated list. Focus on any objective nouns that are mentioned. Examples: loose connector, burning smell, P codes or U codes.
+in the response, only keep the relevant information and avoid any narrative explanations.
+With the key of "identified_codes", given a detailed service event report about an engine or vehicle failure, extract ONLY P codes or U codes that start with a P or U and have 4 digits and truncate values before hyphens if any are present. Codes with hyphens like U0100-00 or P0100-00 should be truncated to U0100, and P0100 respectively. For example text might mention U0100, P2580 etc. If there are no such codes mentioned in Combined Narrative: , return "Not Found"
+Do not include the prefix of "P Code and U Code:" in the response, only keep the relevant information and avoid narrative explanations. If none are found, return "Not found".
+output the final combined response in the format of a python dictionary, with the keys of the dictionary being the following: "complaint", "cause", "repairs", "keywords", "codes", and the values being the answers to the corresponding information above.
+"""
+    summary_prompt = """"Briefly summarize the service information provided within the brackets at the end of these instructions.  Focus on identifying the primary complaint, all fault codes present, what issues were found, what actions were taken to resolve the issues, any parts that were replaced, and any other relevant information.  The given service information may be missing some of these details; in which case, they should not be mentioned in your summary.
+
+            The goal is to provide a factually accurate summary, that is as brief as possible, while still providing a full understanding of the service event.  The service information to be summarized is within these brackets: [ " & PF_Notes & " ]"""
+
+
 class custom_chain:
     def __init__(
         self,
