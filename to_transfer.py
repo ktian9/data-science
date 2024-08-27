@@ -17,31 +17,17 @@ from langchain.docstore.document import Document
 #     input_variables=["page_content"],
 #      template="{page_content}"
 # )
-# document_variable_name = "context"
-# prompt = PromptTemplate.from_template(
-#     "Summarize this content: {context}"
-# )
-
-
-# prompt_refine = PromptTemplate.from_template(
-#     "Here's your first summary: {prev_response}. "
-#     "Now add to it based on the following context: {context}"
-# )
 
 
 class custom_chain:
     def __init__(
         self,
         text_id,
-        summary_prompt,
-        refine_prompt,
         time_delay,
         model: OpenAiGptChatLanguageModel,
     ):
         self.model = model
-        self.summary_prompt = summary_prompt
         self.time_delay = time_delay
-        self.refine_prompt = refine_prompt
         self.text_id = text_id
 
     def process_documents(self, text):
@@ -60,18 +46,29 @@ class custom_chain:
     async def create_and_query_chain_summary(self):
         first_document = self.docs[0]
         remaining_documents = self.docs[1:]
+        
+        document_variable_name = "context"
+        prompt = PromptTemplate.from_template(
+            "Summarize this content: {context}"
+        )
 
-        prev_response = self.query_endpoint(self.summary_prompt, first_document)
+
+
+        prompt_refine = PromptTemplate.from_template(
+            "Here's your first summary: {prev_response}. "
+            "Now add to it based on the following context: {context}"
+        )
+
+        prev_response = self.query_endpoint(prompt.format(document_variable_name=first_document), first_document)
 
         for i in remaining_documents:
             time.sleep(self.time_delay)
             prev_response = self.query_endpoint(self.refine_prompt, prev_response)
 
-    async def query_endpoint(self, prompt, query):
+    async def query_endpoint(self, query):
         request = GptChatCompletionRequest(
             [
-                ChatMessage(ChatMessageRole.SYSTEM, prompt),
-                ChatMessage(ChatMessageRole.USER, query),
+                    ChatMessage(ChatMessageRole.USER, query),
             ]
         )
         resp = self.model.create_chat_completion(request)
