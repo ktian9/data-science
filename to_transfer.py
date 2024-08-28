@@ -86,6 +86,7 @@ output the final combined response in the format of a python dictionary, with th
         for i in remaining_documents:
             time.sleep(self.time_delay)
             prev_response = self.query_endpoint(prompt_refine.format(prev_response=prev_response, context = i.page_content))
+        return prev_response
 
     async def query_endpoint_dict(self, query):
         request = GptChatCompletionRequest(
@@ -132,6 +133,9 @@ output the final combined response in the format of a python dictionary, with th
             time.sleep(self.time_delay)
             prev_response = self.query_endpoint(prompt_refine.format(prev_response=prev_response, context = i.page_content))
 
+        return prev_response
+
+
     async def query_endpoint_summary(self, query):
         request = GptChatCompletionRequest(
             [
@@ -139,7 +143,8 @@ output the final combined response in the format of a python dictionary, with th
             ]
         )
         resp = self.model.create_chat_completion(request)
-        content = resp.choices[0].message.content
+        cont
+        ent = resp.choices[0].message.content
         return content
     
     
