@@ -81,11 +81,11 @@ output the final combined response in the format of a python dictionary, with th
              {context}"""
         )
 
-        prev_response = self.query_endpoint(prompt.format(context=first_document))
+        prev_response = await self.query_endpoint_dict(prompt.format(context=first_document))
 
         for i in remaining_documents:
             time.sleep(self.time_delay)
-            prev_response = self.query_endpoint(prompt_refine.format(prev_response=prev_response, context = i.page_content))
+            prev_response = await self.query_endpoint_dict(prompt_refine.format(prev_response=prev_response, context = i.page_content))
         return prev_response
 
     async def query_endpoint_dict(self, query):
@@ -127,11 +127,11 @@ output the final combined response in the format of a python dictionary, with th
              {context}"""
         )
 
-        prev_response = self.query_endpoint(prompt.format(context=first_document))
+        prev_response = await self.query_endpoint_summary(prompt.format(context=first_document))
 
         for i in remaining_documents:
             time.sleep(self.time_delay)
-            prev_response = self.query_endpoint(prompt_refine.format(prev_response=prev_response, context = i.page_content))
+            prev_response = await self.query_endpoint_summary(prompt_refine.format(prev_response=prev_response, context = i.page_content))
 
         return prev_response
 
