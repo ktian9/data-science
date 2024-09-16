@@ -15,13 +15,12 @@ from langchain.docstore.document import Document
 class custom_chain:
     def __init__(
         self,
-        text_id,
         time_delay,
         model: OpenAiGptChatLanguageModel,
     ):
         self.model = model
         self.time_delay = time_delay
-        self.text_id = text_id
+        
 
     def process_documents(self, text):
         print("Handling documents")
